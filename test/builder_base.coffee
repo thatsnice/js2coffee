@@ -1,5 +1,6 @@
 require 'coffeescript/register'
-require './setup'
+{describe, it, beforeEach} = require 'node:test'
+require './setup-node'
 
 describe 'BuilderBase', ->
   ast = undefined

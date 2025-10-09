@@ -1,5 +1,4 @@
 coffee = require('coffeescript')
-glob = require('glob')
 path = require('path')
 fs = require('fs')
 
@@ -26,9 +25,9 @@ exports.toName = (dirname) ->
 ###
 
 exports.eachGroup = (fn) ->
-  groups = glob.sync("#{exports.root}/*")
+  groups = fs.globSync("#{exports.root}/*")
   for group in groups
-    specDirs = glob.sync("#{group}/*")
+    specDirs = fs.globSync("#{group}/*")
     specs = specDirs.map (spec) ->
       data = fs.readFileSync(spec, 'utf-8')
       name = exports.toName(spec)

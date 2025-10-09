@@ -1,5 +1,6 @@
 require 'coffeescript/register'
-require './setup'
+{describe, it} = require 'node:test'
+require './setup-node'
 
 describe 'Helpers', ->
   {delimit, quote} = require('../lib/helpers')

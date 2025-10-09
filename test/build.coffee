@@ -1,5 +1,6 @@
 require 'coffeescript/register'
-require './setup'
+{describe, it} = require 'node:test'
+require './setup-node'
 
 describe 'build()', ->
   it 'works', ->

@@ -1,4 +1,5 @@
-require './setup'
+{describe, it} = require 'node:test'
+require './setup-node'
 
 describe 'Unsupported', ->
   describe 'thowing unsupported errors', ->

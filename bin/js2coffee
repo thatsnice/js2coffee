@@ -12,7 +12,7 @@ var args = require('../lib/cli')
     alias: { h: 'help', v: 'version', V: 'verbose', i: 'indent' }
   });
 
-var read = require('read-input');
+var read = require('../lib/read-input');
 // Use source files directly for full Babel support
 var js2coffee = require(__dirname + '/../js2coffee.coffee');
 

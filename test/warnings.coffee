@@ -1,4 +1,5 @@
-require('./setup')
+{describe, it, beforeEach} = require 'node:test'
+require './setup-node'
 
 ast = undefined
 warnings = undefined

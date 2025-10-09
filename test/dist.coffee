@@ -1,5 +1,6 @@
 require 'coffeescript/register'
-require './setup'
+{describe, it} = require 'node:test'
+require './setup-node'
 
 describe.skip 'dist bundle (browser - future work)', ->
   distJs2coffee = require('../dist/js2coffee')

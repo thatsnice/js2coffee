@@ -1,4 +1,5 @@
-require './setup'
+{describe, it, beforeEach} = require 'node:test'
+require './setup-node'
 
 describe 'Errors', ->
   err = null

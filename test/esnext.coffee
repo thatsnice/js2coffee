@@ -1,5 +1,6 @@
 require 'coffeescript/register'
-require './setup'
+{describe, it} = require 'node:test'
+require './setup-node'
 
 describe 'ES.Next features (via Babel preprocessing)', ->
 
