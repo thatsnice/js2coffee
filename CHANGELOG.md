@@ -150,9 +150,8 @@ All modern JavaScript features (ES2015+) are currently transpiled to ES5 for max
 
 ## [2.2.0] - 2016-03-21
 
-Final release by original maintainers. See original repository for details.
+Most recent release by original maintainers. See original repository for details.
 
-[2.3.0]: https://github.com/js2coffee/js2coffee/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/js2coffee/js2coffee/releases/tag/v2.2.0
 
 ## About this file
