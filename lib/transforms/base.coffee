@@ -264,8 +264,6 @@ class TransformerBase
 safeExtend = (dest, classes) ->
   added = {}
   classes.forEach (klass) ->
-    # Use Object.getOwnPropertyNames to get all properties, including non-enumerable ones
-    # (CoffeeScript 2.x makes class methods non-enumerable by default)
     for key in Object.getOwnPropertyNames(klass::)
       fn = klass::[key]
       if added[key] and key isnt 'constructor'

@@ -1,11 +1,8 @@
-# Setup for Node.js built-in test runner
 {before} = require 'node:test'
 assert = require 'node:assert/strict'
 
-# Make js2coffee globally available immediately
 global.js2coffee = require '../index'
 
-# Create Chai-like expect API using Node's assert (set up immediately, not in before hook)
 global.expect = (actual) ->
     self =
       actual: actual

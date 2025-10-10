@@ -4,7 +4,7 @@
 require('coffeescript/register');
 
 var args = require('../lib/cli')
-  .helpfile(__dirname+'/../Usage.txt')
+  .helpfile(__dirname+'/../docs/Usage.txt')
   .version(require('../package.json').version)
   .minimist({
     boolean: ['ast', 'verbose', 'compat'],

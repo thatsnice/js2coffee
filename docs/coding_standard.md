@@ -50,6 +50,49 @@ routing   .setup(app)
 - **Semantic grouping**:     Don't align unrelated operations even if they look similar
 - **Language constraints**:  Respect syntax requirements (Python whitespace) over alignment
 
+### Multi-Column Alignment: The Three-Column Pattern
+
+When data has structure with left context, significant middle, and right context, align in three columns:
+
+```coffee
+MODERN_FEATURES = [
+  /// \b const         \s+ ///
+  /// \b let           \s+ ///
+  /// \b class         \s+ ///
+  /// \b async         \s+ ///
+  /// \b await         \s+ ///
+  /// \b import        \s+ ///
+  /// \b export        \s+ ///
+
+  ///    BigInt            ///
+  ///    \d+ n          \b ///
+
+  ///    for \s* await     ///
+  ///    ` [^`]* `         ///
+
+  ///    =>                ///
+  ///    \?\?              ///
+  ///    \? \. (?!\d)      ///
+  ///    \*\*              ///
+  ///    \*\*=             ///
+  ///    \.\.\.            ///
+]
+```
+
+**What this reveals:**
+- **Left column** (`\b`): Start-of-word anchors
+- **Middle column**: The actual pattern being matched (keywords, operators, literals)
+- **Right column** (`\s+`, `\b`): End-of-word/whitespace requirements
+- **Blank lines**: Semantic grouping (keywords, BigInts, special syntax, operators)
+
+**Benefits:**
+- Scan vertically to see all keywords/operators/patterns
+- Spot mistakes easily (misalignments stand out)
+- See patterns emerge (groupings become obvious)
+- Add similar items without disrupting visual structure
+
+**This is why we avoid comments.** The code structure itself communicates the organization.
+
 ### Non-Alignment Indicators
 
 - Different conceptual categories (imports vs assignments vs exports)
