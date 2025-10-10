@@ -13,8 +13,7 @@ var args = require('../lib/cli')
   });
 
 var read = require('../lib/read-input');
-// Use source files directly for full Babel support
-var js2coffee = require(__dirname + '/../js2coffee.coffee');
+var js2coffee = require('../js2coffee.coffee');
 
 read(args._, function (err, res) {
   if (err) {
