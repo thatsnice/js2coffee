@@ -2,12 +2,11 @@
 {before} = require 'node:test'
 assert = require 'node:assert/strict'
 
-before ->
-  # Make js2coffee globally available
-  global.js2coffee = require '../index'
+# Make js2coffee globally available immediately
+global.js2coffee = require '../index'
 
-  # Create Chai-like expect API using Node's assert
-  global.expect = (actual) ->
+# Create Chai-like expect API using Node's assert (set up immediately, not in before hook)
+global.expect = (actual) ->
     self =
       actual: actual
 
@@ -75,5 +74,13 @@ before ->
       to:
         throw: (expected) ->
           self.throw(expected)
+
+      # Chai: expect(x).toBeLessThan(y)
+      toBeLessThan: (expected) ->
+        assert.ok actual < expected, "Expected #{actual} to be less than #{expected}"
+
+      # Chai: expect(x).toBeGreaterThan(y)
+      toBeGreaterThan: (expected) ->
+        assert.ok actual > expected, "Expected #{actual} to be greater than #{expected}"
 
     self
