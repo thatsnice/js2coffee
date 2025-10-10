@@ -84,6 +84,9 @@ module.exports = class Preprocessor
     [
       [
         presetPath
+        # Target ES5 for maximum compatibility with js2coffee's existing transformers
+        # Esprima 4.x can parse ES2017, but js2coffee doesn't have handlers for all ES6+ nodes yet
+        # Future: Could target ES2015+ once we add handlers for classes, destructuring, etc.
         targets:      { ie: '10' }
         modules:      false
         useBuiltIns:  false

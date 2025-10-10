@@ -80,6 +80,24 @@ class Builder extends BuilderBase
     else
       [ node.raw ]
 
+  # ES6 Template Literals - convert to CoffeeScript string interpolation
+  TemplateLiteral: (node) ->
+    # Build CoffeeScript string with interpolation
+    parts = []
+    for quasi, i in node.quasis
+      # Add the string part
+      if quasi.value.raw
+        parts.push quasi.value.raw
+      # Add the interpolation
+      if i < node.expressions.length
+        expr = @walk(node.expressions[i])
+        parts.push "\#{#{expr}}"
+
+    [ '"', parts.join(''), '"' ]
+
+  TemplateElement: (node) ->
+    [ node.value.raw ]
+
   MemberExpression: (node) ->
     right = if node.computed
       [ '[', @walk(node.property), ']' ]
@@ -231,7 +249,7 @@ class Builder extends BuilderBase
     re
 
   FunctionExpression: (node, ctx) ->
-    params = @makeParams(node.params, node.defaults)
+    params = @makeParams(node.params)
 
     expr = @indent (i) =>
       [ params, "->", "\n", @walk(node.body) ]
@@ -240,6 +258,34 @@ class Builder extends BuilderBase
       [ "(", expr, @indent(), ")" ]
     else
       expr
+
+  # ES6 Arrow Functions - treat like FunctionExpression
+  ArrowFunctionExpression: (node, ctx) ->
+    params = @makeParams(node.params)
+    arrow = if node.async then '->' else '->'
+
+    # Arrow functions with expression bodies (x => x + 1)
+    if node.expression
+      if node.async
+        space [ 'await', params, arrow, @walk(node.body) ]
+      else
+        space [ params, arrow, @walk(node.body) ]
+    # Arrow functions with block bodies (x => { return x + 1; })
+    else
+      expr = @indent (i) =>
+        if node.async
+          [ params, arrow, "\n", @walk(node.body) ]
+        else
+          [ params, arrow, "\n", @walk(node.body) ]
+
+      if node._parenthesized
+        [ "(", expr, @indent(), ")" ]
+      else
+        expr
+
+  # ES2017 Async/Await
+  AwaitExpression: (node) ->
+    space [ 'await', @walk(node.argument) ]
 
   EmptyStatement: (node) ->
     [ ]
@@ -396,16 +442,17 @@ class Builder extends BuilderBase
   ###*
   # makeParams():
   # Builds parameters for a function list.
+  # Handles both Esprima 4.x (AssignmentPattern) and legacy formats.
   ###
 
-  makeParams: (params, defaults) ->
+  makeParams: (params) ->
     list = []
 
-    # Account for defaults ("function fn(a = b)")
-    for param, i in params
-      if defaults[i]
-        def = @walk(defaults[i])
-        list.push [@walk(param), ' = ', def]
+    # In Esprima 4.x, default params are represented as AssignmentPattern nodes
+    for param in params
+      if param.type is 'AssignmentPattern'
+        # ES6 default parameter: function(a = 1)
+        list.push [@walk(param.left), ' = ', @walk(param.right)]
       else
         list.push @walk(param)
 
@@ -413,6 +460,10 @@ class Builder extends BuilderBase
       [ '(', delimit(list, ', '), ') ']
     else
       []
+
+  # Handle AssignmentPattern nodes (ES6 default parameters)
+  AssignmentPattern: (node) ->
+    [@walk(node.left), ' = ', @walk(node.right)]
 
   ###*
   # In a call expression, ensure that non-last function arguments get
