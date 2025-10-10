@@ -70,16 +70,13 @@ global.expect = (actual) ->
 
         assert.ok threw, "Expected function to throw"
 
-      # Chai: expect(fn).to.throw(err) - via 'to' property
       to:
         throw: (expected) ->
           self.throw(expected)
 
-      # Chai: expect(x).toBeLessThan(y)
       toBeLessThan: (expected) ->
         assert.ok actual < expected, "Expected #{actual} to be less than #{expected}"
 
-      # Chai: expect(x).toBeGreaterThan(y)
       toBeGreaterThan: (expected) ->
         assert.ok actual > expected, "Expected #{actual} to be greater than #{expected}"
 

@@ -1,11 +1,10 @@
 { describe, test } = require 'node:test'
 require './setup-node'
 
-js2coffee = require '../'
+js2coffee = global.js2coffee
 
 describe 'Conciseness', ->
 
-  # Helper to check that output is shorter than input
   checkShorter = (input, description) ->
     test description, ->
       result = js2coffee.build(input)
@@ -13,7 +12,6 @@ describe 'Conciseness', ->
       inputChars = input.trim().length
       outputChars = output.length
 
-      # Output should be shorter than input
       expect(outputChars).toBeLessThan(inputChars)
 
   describe 'Function declarations', ->
