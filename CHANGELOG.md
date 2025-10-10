@@ -146,5 +146,5 @@ Special thanks to the original js2coffee maintainers for creating this excellent
 
 Final release by original maintainers. See original repository for details.
 
-[2.3.0]: https://github.com/thatsnice/js2coffee/compare/v2.2.0...v2.3.0
+[2.3.0]: https://github.com/js2coffee/js2coffee/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/js2coffee/js2coffee/releases/tag/v2.2.0

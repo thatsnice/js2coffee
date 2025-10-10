@@ -1,5 +1,7 @@
 # js2coffee 2.3.0: ES.Next Support + CoffeeScript 2.x Migration
 
+Fixes #516
+
 ## Summary
 
 This PR modernizes js2coffee to support ES2015 through ES2023+ JavaScript syntax while resolving the CoffeeScript 2.x migration that has blocked the project since 2017.
@@ -144,7 +146,6 @@ New ES.Next tests cover:
 
 - **CHANGELOG.md**: Comprehensive documentation of all changes
 - **docs/README.md**: Updated with ES.Next support and TypeScript workflow
-- **docs/TODO.md**: Implementation roadmap and architecture decisions
 - All existing documentation preserved and enhanced
 
 ## Migration Guide
