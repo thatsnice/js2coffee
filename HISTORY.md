@@ -1,6 +1,10 @@
 ## [Unreleased]
 
 ### Changed
+- Upgrade to CoffeeScript 2.x
+  - Update from `coffee-script` 1.8 to `coffeescript` 2.7.0
+  - Fix constructor super() argument passing for CS 2.x compatibility
+  - Fix property iteration to use Object.getOwnPropertyNames() for CS 2.x
 - Upgrade parsing libraries for ES6/ES2017 support:
   - esprima:    2.5.0 → 4.0.1 (ES2017 support)
   - escodegen:  1.6.0 → 2.1.0
