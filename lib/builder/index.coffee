@@ -28,7 +28,7 @@ module.exports =
 class Builder extends BuilderBase
 
   constructor: (ast, options={}) ->
-    super
+    super ast, options
     @_indent = 0
 
   ###*
