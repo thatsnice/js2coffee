@@ -1,3 +1,18 @@
+## [Unreleased]
+
+### Changed
+- Upgrade parsing libraries for ES6/ES2017 support:
+  - esprima: 2.5.0 → 4.0.1 (ES2017 support)
+  - escodegen: 1.6.0 → 2.1.0
+  - estraverse: 4.1.1 → 5.3.0
+  - source-map: 0.5.2 → 0.7.6
+
+### Added
+- Support for ES6 arrow functions (`=>` converts to `->`)
+- Support for ES6 template literals (converts to CoffeeScript string interpolation)
+- Support for ES6 default parameters
+- Support for ES2017 async/await syntax
+
 ## [v2.2.0]
 > Apr  2, 2016
 
