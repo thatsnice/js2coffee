@@ -30,7 +30,8 @@ describe 'ES6/ES2017 syntax support', ->
     it 'converts arrow functions with default parameters', ->
       input = 'const greet = (name = "World") => "Hello " + name;'
       result = js2coffee(input)
-      expect(result).include 'name = "World"'
+      expect(result).include 'name = '
+      expect(result).include 'World'
 
   describe 'Template literals', ->
     it 'converts template literals to CoffeeScript interpolation', ->

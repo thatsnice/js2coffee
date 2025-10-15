@@ -68,6 +68,10 @@ class Builder extends BuilderBase
     else
       @paren [ node.operator, @walk(node.argument) ]
 
+  # ES2017 Async/await
+  AwaitExpression: (node) ->
+    @paren [ 'await ', @walk(node.argument) ]
+
   # Operator (+)
   BinaryExpression: (node) ->
     operator = node.operator
@@ -79,6 +83,25 @@ class Builder extends BuilderBase
       [ quote(node.value) ]
     else
       [ node.raw ]
+
+  # ES6 Template literals
+  TemplateLiteral: (node) ->
+    # Convert template literal to CoffeeScript string interpolation
+    parts = []
+    for element, i in node.quasis
+      # Add the raw text part
+      if element.value.cooked
+        parts.push element.value.cooked
+
+      # Add interpolation if not the last element
+      if i < node.expressions.length
+        parts.push "\#{#{@walk(node.expressions[i])}}"
+
+    [ '"', parts.join(''), '"' ]
+
+  TemplateElement: (node) ->
+    # Template elements are handled by TemplateLiteral
+    [ node.value.cooked or node.value.raw ]
 
   MemberExpression: (node) ->
     right = if node.computed
@@ -235,6 +258,24 @@ class Builder extends BuilderBase
 
     expr = @indent (i) =>
       [ params, "->", "\n", @walk(node.body) ]
+
+    if node._parenthesized
+      [ "(", expr, @indent(), ")" ]
+    else
+      expr
+
+  # ES6 Arrow functions
+  ArrowFunctionExpression: (node, ctx) ->
+    params = @makeParams(node.params, node.defaults)
+
+    # Arrow function with expression body (no braces)
+    if node.body.type isnt 'BlockStatement'
+      expr = @indent (i) =>
+        [ params, "-> ", @walk(node.body) ]
+    else
+      # Arrow function with block body
+      expr = @indent (i) =>
+        [ params, "->", "\n", @walk(node.body) ]
 
     if node._parenthesized
       [ "(", expr, @indent(), ")" ]
@@ -403,7 +444,11 @@ class Builder extends BuilderBase
 
     # Account for defaults ("function fn(a = b)")
     for param, i in params
-      if defaults[i]
+      # ES6: AssignmentPattern (param = default)
+      if param.type is 'AssignmentPattern'
+        list.push [@walk(param.left), ' = ', @walk(param.right)]
+      # ES5: defaults array
+      else if defaults?[i]
         def = @walk(defaults[i])
         list.push [@walk(param), ' = ', def]
       else
