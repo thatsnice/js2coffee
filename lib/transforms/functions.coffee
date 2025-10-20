@@ -29,6 +29,10 @@ module.exports = class extends TransformerBase
     body.splice(idx, 0, prebody...)
 
   FunctionDeclaration: (node) ->
+    # Handle async without await before converting
+    if node.async and not @containsAwait(node.body)
+      @handleAsyncWithoutAwait(node)
+
     @ctx.prebody.push @buildFunctionDeclaration(node)
     @pushStack(node.body)
     return
@@ -49,6 +53,11 @@ module.exports = class extends TransformerBase
 
   FunctionExpressionExit: (node) ->
     @popStack()
+
+    # Handle async without await
+    if node.async and not @containsAwait(node.body)
+      @handleAsyncWithoutAwait(node)
+
     if node.id
       if @options.compat
         @escapeJs node, parenthesized: true
@@ -57,6 +66,19 @@ module.exports = class extends TransformerBase
         node
     else
       node
+
+  ArrowFunctionExpression: (node) ->
+    @pushStack(node.body)
+    return
+
+  ArrowFunctionExpressionExit: (node) ->
+    @popStack()
+
+    # Handle async without await
+    if node.async and not @containsAwait(node.body)
+      @handleAsyncWithoutAwait(node)
+
+    node
 
   ###
   # If a comment is adjacent to a function,
@@ -90,7 +112,82 @@ module.exports = class extends TransformerBase
           params: node.params
           defaults: node.defaults
           body: node.body
+          async: node.async
       ]
+
+  ###
+  # Check if a node tree contains any AwaitExpression nodes
+  ###
+
+  containsAwait: (node) ->
+    return true if node.type is 'AwaitExpression'
+
+    # Recursively check all child nodes
+    for key of node
+      continue unless node.hasOwnProperty(key)
+      value = node[key]
+
+      if typeof value is 'object' and value?
+        if Array.isArray(value)
+          for item in value
+            return true if @containsAwait(item)
+        else if value.type
+          return true if @containsAwait(value)
+
+    false
+
+  ###
+  # Handle async functions without await by appending 'return; await null'
+  ###
+
+  handleAsyncWithoutAwait: (node) ->
+    @warn node, "Async function without await converted to use 'return; await null' pattern"
+
+    if node.body.type is 'BlockStatement'
+      # Convert final return statements to expression statements (for implicit returns)
+      lastIdx = node.body.body.length - 1
+      if lastIdx >= 0
+        lastStmt = node.body.body[lastIdx]
+        if lastStmt.type is 'ReturnStatement' and lastStmt.argument
+          # Convert final return to expression statement
+          node.body.body[lastIdx] =
+            type: 'ExpressionStatement'
+            expression: lastStmt.argument
+
+      # Append explicit return (no argument) and return await null
+      # Using "return await null" as the final statement prevents unreturnify from adding another return
+      node.body.body.push
+        type: 'ReturnStatement'
+        argument: null
+
+      node.body.body.push
+        type: 'ReturnStatement'
+        argument:
+          type: 'AwaitExpression'
+          argument:
+            type: 'Literal'
+            value: null
+            raw: 'null'
+    else
+      # Expression body - convert to block and add original return, then return, then return await null
+      originalBody = node.body
+      node.body =
+        type: 'BlockStatement'
+        body: [
+          type: 'ReturnStatement'
+          argument: originalBody
+        ,
+          type: 'ReturnStatement'
+          argument: null
+        ,
+          type: 'ReturnStatement'
+          argument:
+            type: 'AwaitExpression'
+            argument:
+              type: 'Literal'
+              value: null
+              raw: 'null'
+        ]
 
 ###
 # Looks up the first non-variable-declaration in a body

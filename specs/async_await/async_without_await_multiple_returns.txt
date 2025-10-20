@@ -1,0 +1,16 @@
+warnings: [ /Async function without await/ ]
+----
+async function checkValue(x) {
+  if (x < 0) return 'negative';
+  if (x === 0) return 'zero';
+  return 'positive';
+}
+----
+checkValue = (x) ->
+  if x < 0
+    return 'negative'
+  if x == 0
+    return 'zero'
+  'positive'
+  return
+  await null

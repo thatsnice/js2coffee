@@ -1,0 +1,10 @@
+warnings: [ /Async function without await/ ]
+----
+async function withoutAwait() {
+  return 42;
+}
+----
+withoutAwait = ->
+  42
+  return
+  await null
