@@ -24,8 +24,11 @@ We are breaking up improvements to js2coffee into 8 focused PRs to minimize scop
    - Branch: `pr-libs`
 
 4. **PR-BABEL**: Babel integration (pr-libs → pr-babel)
-   - Status: Not started
-   - Depends on: PR-LIBS
+   - Status: ✅ COMPLETED (1 commit, ready to submit)
+   - Integrate @babel/parser to replace esprima
+   - Provides better modern JavaScript support (ES.Next features)
+   - Includes AST normalization layer for compatibility
+   - 299/315 tests passing (95%), 16 edge case failures
    - Branch: `pr-babel`
 
 5. **PR-ESNEXT**: ES.Next transforms (pr-babel → pr-esnext)
