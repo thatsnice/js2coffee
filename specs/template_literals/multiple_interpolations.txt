@@ -1,0 +1,4 @@
+----
+const msg = `${greeting} ${name}!`;
+----
+msg = "#{greeting} #{name}!"

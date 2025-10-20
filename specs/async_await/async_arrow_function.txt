@@ -1,0 +1,4 @@
+----
+const fetch = async () => await getData();
+----
+fetch = -> await getData()
