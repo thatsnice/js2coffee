@@ -17,10 +17,10 @@ We are breaking up improvements to js2coffee into 8 focused PRs to minimize scop
    - Branch: `pr-test`
 
 3. **PR-LIBS**: Library upgrades (master → pr-libs)
-   - Status: 🔄 IN PROGRESS
+   - Status: ✅ COMPLETED (6 commits, ready to submit)
    - Upgrade esprima and other parsing libraries
    - Add ES6/ES2017 support (template literals, arrow functions, async/await)
-   - Current commits: 5 (with uncommitted async-without-await work)
+   - Includes async-without-await edge case handling
    - Branch: `pr-libs`
 
 4. **PR-BABEL**: Babel integration (pr-libs → pr-babel)
@@ -67,16 +67,16 @@ We are breaking up improvements to js2coffee into 8 focused PRs to minimize scop
 4. Document library upgrades and new ES6/ES2017 support
 5. Move ES6/ES2017 tests from unit tests to spec files
 
-### Current Work (uncommitted)
-- Async-without-await transformation using Promise constructor pattern
-- Modified files:
-  - `lib/builder/index.coffee` - Added containsAwait(), wrapAsyncBody(), modified handlers
-  - `lib/transforms/functions.coffee` - Preserve async property
-  - Moved `specs/pending/async_without_await.txt` to `specs/async_await/`
-  - Added `specs/async_await/async_without_await_multiple_returns.txt`
+### PR-LIBS Completed Work
+All commits finalized and ready for submission.
 
 ### Key Design Decisions
-- Async functions without `await` are transformed to `new Promise((resolve, reject) => ...)` pattern
+- Async functions without `await` are transformed by appending `return; await null` pattern
+  - Simpler than Promise constructor wrapping
+  - CoffeeScript generates async functions when it sees `await`
+  - The explicit `return` makes it clear the `await null` is unreachable code
+  - Issues a warning to help developers locate these transformations
+  - Example: `async function f() { return 42; }` becomes `f = -> 42; return; await null`
 - This provides a friction-free path from TypeScript to CoffeeScript for edge cases
 - `===` is converted to `==` (both are strict equality in CoffeeScript)
 - Template literals convert to CoffeeScript string interpolation `"#{...}"`
