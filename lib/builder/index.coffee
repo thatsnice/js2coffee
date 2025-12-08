@@ -84,6 +84,38 @@ class Builder extends BuilderBase
     else
       [ node.raw ]
 
+  # Babel-specific literal types
+  NumericLiteral: (node) ->
+    raw = node.extra?.raw
+    if raw and not raw.includes('_')
+      [ raw ]
+    else
+      [ String(node.value) ]
+
+  StringLiteral: (node) ->
+    raw = node.extra?.raw
+    if raw
+      # Preserve the original quote style if possible
+      if raw[0] is '"' and raw[raw.length - 1] is '"'
+        # Convert double quotes to single quotes for CoffeeScript
+        content = raw[1...raw.length - 1]
+        content = content.replace(/'/g, "\\'")
+        content = content.replace(/\\"/g, '"')
+        "'#{content}'"
+      else
+        raw
+    else
+      [ quote(node.value) ]
+
+  BooleanLiteral: (node) ->
+    [ String(node.value) ]
+
+  NullLiteral: (node) ->
+    [ 'null' ]
+
+  RegExpLiteral: (node) ->
+    [ node.extra?.raw or "/#{node.pattern}/#{node.flags or ''}" ]
+
   # ES6 Template literals
   TemplateLiteral: (node) ->
     # Convert template literal to CoffeeScript string interpolation
@@ -238,6 +270,21 @@ class Builder extends BuilderBase
       throw new Error("Property: not sure about kind " + node.kind)
 
     space [ [@walk(node.key), ":"], @walk(node.value) ]
+
+  # Babel-specific object types
+  ObjectProperty: (node) ->
+    space [ [@walk(node.key), ":"], @walk(node.value) ]
+
+  ObjectMethod: (node) ->
+    # Convert ObjectMethod to ObjectProperty with FunctionExpression value
+    funcNode =
+      type: 'FunctionExpression'
+      params: node.params
+      body: node.body
+      async: node.async
+      generator: node.generator
+
+    space [ [@walk(node.key), ":"], @walk(funcNode) ]
 
   # TODO: convert VariableDeclaration into AssignmentExpression
   VariableDeclaration: (node) ->

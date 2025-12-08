@@ -241,7 +241,7 @@ exports.getPrecedence = (node) ->
       '||': 5
 
   switch type
-    when 'Literal', 'Identifier'
+    when 'Literal', 'Identifier', 'NumericLiteral', 'StringLiteral', 'BooleanLiteral', 'NullLiteral', 'RegExpLiteral'
       99
     when 'MemberExpression', 'CallExpression'
       18
@@ -391,7 +391,12 @@ exports.isLoop = (node) ->
 ###
 
 exports.isTruthy = (node) ->
-  (node.type is 'Literal' and node.value)
+  # Handle both Esprima's Literal and Babel's specific literal types
+  return true if node.type is 'BooleanLiteral' and node.value is true
+  return true if node.type is 'NumericLiteral' and node.value isnt 0
+  return true if node.type is 'StringLiteral' and node.value.length > 0
+  return true if node.type is 'Literal' and node.value
+  false
 
 ###
 # escapeJs()

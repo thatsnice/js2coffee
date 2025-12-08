@@ -178,6 +178,14 @@ class TransformerBase
       es.VisitorKeys.CoffeeDoExpression = ['function']
       es.VisitorKeys.BlockComment = []
       es.VisitorKeys.LineComment = []
+      # Babel-specific node types
+      es.VisitorKeys.NumericLiteral = []
+      es.VisitorKeys.StringLiteral = []
+      es.VisitorKeys.BooleanLiteral = []
+      es.VisitorKeys.NullLiteral = []
+      es.VisitorKeys.RegExpLiteral = []
+      es.VisitorKeys.ObjectProperty = ['key', 'value']
+      es.VisitorKeys.ObjectMethod = ['key', 'params', 'body']
       es
 
   ###*
@@ -221,9 +229,15 @@ class TransformerBase
   ###
   
   warn: (node, description) ->
+    # Create clean {line, column} objects without Babel's .index property
+    start = if node.loc?.start
+      {line: node.loc.start.line, column: node.loc.start.column}
+    end = if node.loc?.end
+      {line: node.loc.end.line, column: node.loc.end.column}
+
     @warnings.push
-      start: node.loc?.start
-      end: node.loc?.end
+      start: start
+      end: end
       filename: @options.filename
       description: description
 
@@ -248,13 +262,14 @@ class TransformerBase
     node
 
   escapeJs: (node, options = {}) ->
+    generate = require('@babel/generator').default
     replace node,
       type: 'CoffeeEscapedExpression'
       _parenthesized: options.parenthesized
-      raw: require('escodegen').generate node,
-        format:
-          indent:
-            style: toIndent(@options.indent)
+      raw: generate(node,
+        indent: toIndent(@options.indent)
+        compact: false
+      ).code
 
 ###
 # Extends a class `dest`'s prototype with those from other classes in `classes`.
