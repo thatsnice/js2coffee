@@ -72,9 +72,17 @@ exports.buildError = (err, source, file = '') ->
   if err.js2coffee then return err
 
   # Extract description from Babel's message format: "Description. (line:col)"
-  description = err.message.replace(/\s*\(\d+:\d+\)$/, '')
-  line = err.loc.line
-  column = err.loc.column
+  if err.message
+    description = err.message.replace(/\s*\(\d+:\d+\)$/, '')
+  else
+    description = 'Syntax error'
+
+  if err.loc
+    line = err.loc.line
+    column = err.loc.column
+  else
+    line = 1
+    column = 0
 
   heading = "#{file}:#{line}:#{column}: #{description}"
 

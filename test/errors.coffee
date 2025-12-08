@@ -10,7 +10,7 @@ describe 'Errors', ->
       err = e
 
   it 'throws them properly', ->
-    expect(err.message).include ':5:3: Unexpected token )'
+    expect(err.message).include ':5:3: Missing semicolon.'
 
   it 'has context lines', ->
     expect(err.message).include '3  c'
