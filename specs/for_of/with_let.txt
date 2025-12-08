@@ -1,0 +1,7 @@
+----
+for (let x of arr) {
+  process(x);
+}
+----
+for x from arr
+  process x

@@ -16,6 +16,13 @@
 - Support for ES6 template literals (converts to CoffeeScript string interpolation)
 - Support for ES6 default parameters
 - Support for ES2017 async/await syntax
+- Support for ES.Next optional chaining (`obj?.prop` → `obj?.prop`)
+- Support for ES.Next optional call (`fn?.()` → `fn?()`)
+- Support for ES.Next nullish coalescing (`a ?? b` → `a ? b`)
+- Support for ES6 spread elements (`[...arr]` → `[arr...]`)
+- Support for ES6 rest parameters (`(...args) =>` → `(args...) ->`)
+- Support for ES6 for...of loops (`for (x of arr)` → `for x from arr`)
+- Support for ES6 classes (class declarations, methods, properties, static members)
 
 ## [v2.2.0]
 > Apr  2, 2016

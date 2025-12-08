@@ -1,0 +1,4 @@
+----
+const fn = (...args) => args;
+----
+fn = (args...) -> args

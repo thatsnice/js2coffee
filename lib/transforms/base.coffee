@@ -186,6 +186,17 @@ class TransformerBase
       es.VisitorKeys.RegExpLiteral = []
       es.VisitorKeys.ObjectProperty = ['key', 'value']
       es.VisitorKeys.ObjectMethod = ['key', 'params', 'body']
+      # ES.Next node types
+      es.VisitorKeys.OptionalMemberExpression = ['object', 'property']
+      es.VisitorKeys.OptionalCallExpression = ['callee', 'arguments']
+      es.VisitorKeys.SpreadElement = ['argument']
+      es.VisitorKeys.RestElement = ['argument']
+      es.VisitorKeys.ForOfStatement = ['left', 'right', 'body']
+      es.VisitorKeys.ClassDeclaration = ['id', 'superClass', 'body']
+      es.VisitorKeys.ClassExpression = ['id', 'superClass', 'body']
+      es.VisitorKeys.ClassBody = ['body']
+      es.VisitorKeys.ClassMethod = ['key', 'params', 'body']
+      es.VisitorKeys.ClassProperty = ['key', 'value']
       es
 
   ###*

@@ -1,0 +1,7 @@
+----
+const combined = [...arr1, ...arr2];
+----
+combined = [
+  arr1...
+  arr2...
+]

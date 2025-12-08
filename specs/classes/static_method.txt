@@ -1,0 +1,10 @@
+----
+class Utils {
+  static helper() {
+    return true;
+  }
+}
+----
+class Utils
+  @helper: ->
+    return true

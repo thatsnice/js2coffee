@@ -1,0 +1,4 @@
+----
+func(...args)
+----
+func args...

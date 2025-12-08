@@ -149,6 +149,7 @@ class Builder extends BuilderBase
     opers =
       '||': 'or'
       '&&': 'and'
+      '??': '?'  # ES.Next: Nullish coalescing
 
     oper = opers[node.operator]
     @paren [ @walk(node.left), ' ', oper, ' ', @walk(node.right) ]
@@ -463,7 +464,91 @@ class Builder extends BuilderBase
 
   CoffeeDoExpression: (node) ->
     space [ 'do', @walk(node.function) ]
-    
+
+  # ES.Next: Optional chaining - obj?.prop
+  OptionalMemberExpression: (node) ->
+    right = if node.computed
+      [ '?[', @walk(node.property), ']' ]
+    else
+      [ '?.', @walk(node.property) ]
+
+    @paren [ @walk(node.object), right ]
+
+  # ES.Next: Optional call - func?.()
+  OptionalCallExpression: (node) ->
+    callee = @walk(node.callee)
+    list = @makeSequence(node.arguments)
+
+    hasArgs = list.length > 0
+    if hasArgs
+      [ callee, '?(', list, ')' ]
+    else
+      [ callee, '?()' ]
+
+  # ES.Next: Spread element - [...arr] or f(...args)
+  SpreadElement: (node) ->
+    [ @walk(node.argument), '...' ]
+
+  # ES.Next: Rest element - (...params) =>
+  RestElement: (node) ->
+    [ @walk(node.argument), '...' ]
+
+  # ES.Next: For...of loop - for (x of arr)
+  ForOfStatement: (node) ->
+    left = @walk(node.left.declarations?[0]?.id ? node.left)
+    right = @walk(node.right)
+    body = @makeLoopBody(node.body)
+
+    [ 'for ', left, ' from ', right, "\n", body ]
+
+  # ES.Next: Class declaration
+  ClassDeclaration: (node) ->
+    @buildClass(node)
+
+  # ES.Next: Class expression
+  ClassExpression: (node) ->
+    @buildClass(node)
+
+  # Helper to build class
+  buildClass: (node) ->
+    header = ['class']
+    if node.id
+      header.push ' ', @walk(node.id)
+    if node.superClass
+      header.push ' extends ', @walk(node.superClass)
+
+    @indent (i) =>
+      [ header, "\n", @walk(node.body) ]
+
+  # ES.Next: Class body
+  ClassBody: (node) ->
+    statements = node.body.map (member) =>
+      [ @indent(), @walk(member), "\n" ]
+    statements
+
+  # ES.Next: Class method
+  ClassMethod: (node) ->
+    name = @walk(node.key)
+    params = @makeParams(node.params)
+
+    prefix = if node.static then '@' else ''
+    methodName = if node.kind is 'constructor'
+      'constructor'
+    else
+      prefix + name
+
+    @indent (i) =>
+      [ methodName, ': ', params, '->', "\n", @walk(node.body) ]
+
+  # ES.Next: Class property
+  ClassProperty: (node) ->
+    name = @walk(node.key)
+    prefix = if node.static then '@' else ''
+    if node.value
+      [ prefix, name, ': ', @walk(node.value) ]
+    else
+      [ prefix, name, ': undefined' ]
+
   ###*
   # makeSequence():
   # Builds a comma-separated sequence of nodes.

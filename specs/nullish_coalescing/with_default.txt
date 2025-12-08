@@ -1,0 +1,4 @@
+----
+const value = input ?? "default";
+----
+value = input ? 'default'

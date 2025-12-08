@@ -1,0 +1,4 @@
+----
+callback?.(a, b, c)
+----
+callback?(a, b, c)
