@@ -36,13 +36,15 @@ module.exports = class extends TransformerBase
   # Updates comment `type` as needed. It changes *Block* to *BlockComment*, and
   # *Line* to *LineComment*. This makes it play nice with the rest of the AST,
   # because "Block" and "Line" are ambiguous.
+  #
+  # Handles both Esprima format (Block/Line) and Babel format (CommentBlock/CommentLine).
   ###
 
   updateCommentTypes: ->
     for c in @comments
       switch c.type
-        when 'Block' then c.type = 'BlockComment'
-        when 'Line'  then c.type = 'LineComment'
+        when 'Block', 'CommentBlock' then c.type = 'BlockComment'
+        when 'Line', 'CommentLine'   then c.type = 'LineComment'
 
   ###
   # Injects comment nodes into a node list.
@@ -67,22 +69,28 @@ module.exports = class extends TransformerBase
     left = range[0]
     right = range[1]
 
+    # Helper to get start position (supports both Babel and Esprima formats)
+    getStart = (node) -> node.start ? node.range?[0]
+    getEnd = (node) -> node.end ? node.range?[1]
+
     findComments = (left, right) =>
       @comments.filter (c) ->
-        c.range[0] >= left and c.range[1] <= right
+        getStart(c) >= left and getEnd(c) <= right
 
     if body.length > 0
-      # look for comments in left..item.range[0]
+      # look for comments in left..item.start
       # (ie, before each item)
       for item, i in body
-        if item.range
-          newComments = findComments(left, item.range[0])
+        itemStart = getStart(item)
+        if itemStart?
+          newComments = findComments(left, itemStart)
           list = list.concat(newComments)
 
         list.push item
 
-        if item.range
-          left = item.range[1]
+        itemEnd = getEnd(item)
+        if itemEnd?
+          left = itemEnd
 
     # look for the final one (also accounts for empty bodies)
     newComments = findComments(left, right)

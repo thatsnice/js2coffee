@@ -46,7 +46,7 @@ js2coffee.build = (source, options = {}) ->
 
 ###*
 # parseJS() : js2coffee.parseJS(source, [options])
-# Parses JavaScript code into an AST via Esprima.
+# Parses JavaScript code into an AST via Babel parser.
 # Returns a JavaScript AST. Throws an error if parsing can't continue.
 #
 #     try
@@ -57,8 +57,38 @@ js2coffee.build = (source, options = {}) ->
 
 js2coffee.parseJS = (source, options = {}) ->
   try
-    Esprima = require('esprima')
-    Esprima.parse(source, loc: true, range: true, comment: true)
+    BabelParser = require('@babel/parser')
+    result = BabelParser.parse(source,
+      sourceType: 'script'
+      ranges: true
+      plugins: [
+        'asyncGenerators'
+        'bigInt'
+        'classPrivateMethods'
+        'classPrivateProperties'
+        'classProperties'
+        'decorators-legacy'
+        'doExpressions'
+        'dynamicImport'
+        'exportDefaultFrom'
+        'exportNamespaceFrom'
+        'functionBind'
+        'functionSent'
+        'importMeta'
+        'nullishCoalescingOperator'
+        'numericSeparator'
+        'objectRestSpread'
+        'optionalCatchBinding'
+        'optionalChaining'
+        'throwExpressions'
+      ]
+    )
+
+    # Babel returns a File node with program inside
+    # Extract the program and transfer comments to it
+    program = result.program
+    program.comments = result.comments
+    program
   catch err
     throw buildError(err, source, options.filename)
 
@@ -84,6 +114,11 @@ js2coffee.transform = (ast, options = {}) ->
   ctx = {}
   run = (classes) -> TransformerBase.run(ast, options, classes, ctx)
   comments = not (options.comments is false)
+
+  # Converts Babel directives to ExpressionStatements.
+  run [
+    require('./lib/transforms/directives')
+  ]
 
   # Injects comments into the AST as BlockComment and LineComment nodes.
   run [
