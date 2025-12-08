@@ -51,37 +51,30 @@ exports.prependAll = (list, prefix) ->
 
 ###*
 # buildError():
-# Builds a syntax error message.
+# Builds a syntax error message from a Babel parser error.
+#
+# Babel error format:
 #
 #     e =
-#       description: "Unexpected indentifier"
-#       start: { line: 3, column: 1 }
-#       end: { line: 3, column: 5 }
-#     err = buildError(e, code, "index.js")
-#
-# Or esprima-like:
-#
-#     e =
-#       description: "Unexpected indentifier"
-#       lineNumber: 3,
-#       column: 1
+#       message: "Missing semicolon. (3:1)"
+#       loc: { line: 3, column: 1 }
 #     err = buildError(e, code, "index.js")
 #
 # Output:
 #
-#     err.message       #=> "index.js:3:1: Unexpected indentifier\n..."
+#     err.message       #=> "index.js:3:1: Missing semicolon.\n..."
 #     err.start         #=> { line: 3, column: 1 }
-#     err.end           #=> { line: 3, column: 5 }
-#     err.description   #=> "Unexpected identifier"
+#     err.description   #=> "Missing semicolon."
 #     err.sourcePreview
 ###
 
 exports.buildError = (err, source, file = '') ->
   if err.js2coffee then return err
 
-  {description} = err
-  line = err.start?.line ? err.lineNumber
-  column = err.start?.column ? (err.column && (err.column - 1)) ? 0
+  # Extract description from Babel's message format: "Description. (line:col)"
+  description = err.message.replace(/\s*\(\d+:\d+\)$/, '')
+  line = err.loc.line
+  column = err.loc.column
 
   heading = "#{file}:#{line}:#{column}: #{description}"
 
